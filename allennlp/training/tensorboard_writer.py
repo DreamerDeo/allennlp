@@ -5,12 +5,13 @@ import os
 from tensorboardX import SummaryWriter
 import torch
 
+from allennlp.common.from_params import FromParams
 from allennlp.models.model import Model
 
 logger = logging.getLogger(__name__)
 
 
-class TensorboardWriter:
+class TensorboardWriter(FromParams):
     """
     Class that handles Tensorboard (and other) logging.
 
@@ -210,3 +211,13 @@ class TensorboardWriter:
         else:
             # skip it
             pass
+
+    def close(self) -> None:
+        """
+        Calls the ``close`` method of the ``SummaryWriter`` s which makes sure that pending
+        scalars are flushed to disk and the tensorboard event files are closed properly.
+        """
+        if self._train_log is not None:
+            self._train_log.close()
+        if self._validation_log is not None:
+            self._validation_log.close()
